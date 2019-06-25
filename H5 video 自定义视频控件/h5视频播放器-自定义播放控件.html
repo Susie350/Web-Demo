@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>视频播放</title>
+    <style>
+        * {
+            margin: 0px;
+            padding: 0px;
+        }
+        .fullscreen-box {
+            position: absolute !important;
+            width: 100% !important;
+            height: 100% !important;
+        }
+        .box {
+            width: 600px;
+            height: 368px;
+            box-sizing: border-box;
+        }
+        .video-box {
+            box-sizing: border-box;
+            background-color: #000;
+            padding: 20px 20px 44px 20px;
+            text-align: center;
+            height: 100%;
+            position: relative;
+        }
+        .controls {
+            box-sizing: border-box;
+            background-color: #292929;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            height: 44px;
+            width: 100%;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            text-align: left;
+        }
+        .video-btn {
+            /*flex-grow: 1;*/
+            /*flex-shrink: 0;*/
+        }
+        .start {
+            border-top: 12px solid #292929;
+            border-bottom: 12px solid #292929;
+            border-left: 20px solid #fff;
+            width: 0px;
+            cursor: pointer;
+            margin-right: 12px;
+        }
+        .pause {
+            font-size: 0;
+            display: none;
+            width: 26px;
+            cursor: pointer;
+        }
+        .pause div{
+            display: inline-block;
+            background-color: #fff;
+            width: 7px;
+            height: 24px;
+            border-radius: 2px;
+            margin-right: 6px;
+        }
+        .video-progress {
+            position: relative;
+            background-color: dimgray;
+            flex-grow: 1;
+            height: 10px;
+            border-radius: 2px;
+            font-size: 0;
+        }
+        .video-played {
+            position: absolute;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            background-color: #ffffff;
+            display: inline-block;
+            height: 100%;
+        }
+        .video-loaded {
+            position: absolute;
+            z-index: 0;
+            left: 0;
+            top: 0;
+            background-color: #8a8a8a;
+            display: inline-block;
+            height: 100%;
+            width: 50px;
+        }
+        .video-time {
+            padding: 0 10px;
+            font-size: 0px;
+            flex-shrink: 0;
+        }
+        .video-time span{
+            color: #fff;
+            font-size: 12px;
+        }
+        .fullscreen-btn {
+            padding: 0 10px 0 14px;
+        }
+        .fullscreen-btn img {
+            width: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <div class="video-box">
+            <video height="300" width="533">
+                <source src="http://vfx.mtime.cn/Video/2019/03/19/mp4/190319222227698228.mp4" type="video/mp4">
+            </video>
+            <!--视频控件-->
+            <div class="controls">
+                <!--播放暂停按钮-->
+                <div class="video-btn">
+                    <!--播放按钮-->
+                    <div class="start"></div>
+                    <!--暂停按钮-->
+                    <div class="pause">
+                        <div></div>
+                        <div></div>
+                    </div>
+                </div>
+                <!--进度条-->
+                <div class="video-progress">
+                    <!--已缓冲时长-->
+                    <div class="video-loaded"></div>
+                    <!--已播放时长-->
+                    <div class="video-played"></div>
+                </div>
+                <div class="video-time">
+                    <span id="video-current">00:00:00</span>
+                    <span>&nbsp;/&nbsp;</span>
+                    <span id="video-duration">00:00:00</span>
+                </div>
+                <div class="fullscreen-btn">
+                    <img id="enter-fullscreen" src="fullscreen.png" alt="全屏">
+                    <img id="exit-fullscreen" src="exit-fullscreen.png" alt="退出全屏" class="hidden">
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <script>
+        (function () {
+            const boxDOM = document.querySelector('.box');
+            const videoObj = document.getElementsByTagName('video')[0];
+            const startBtn = document.querySelector('.start');
+            const pauseBtn = document.querySelector('.pause');
+            const videoOriginHeight = videoObj.height;
+            const videoOriginWidth = videoObj.width;
+            // let videoDuration = 0;
+
+            //检测为PC端还是移动端
+            function checkDevice() {
+
+            }
+
+            //检测浏览器是否为全屏
+            function checkFull() {
+                var isFull = document.fullscreenEnabled || window.fullScreen || document.webkitIsFullScreen || document.msFullscreenEnabled;
+
+                //to fix : false || undefined == undefined
+                if (isFull === undefined) {
+                    isFull = false;
+                }
+                return isFull;
+            }
+
+            //进入全屏
+            function fullScreen() {
+                // if (checkFull() === false) {
+                    var ele = document.documentElement;
+                    if (ele.requestFullscreen) {
+                        ele.requestFullscreen();
+                    } else if (ele.mozRequestFullScreen) {
+                        ele.mozRequestFullScreen();
+                    } else if (ele.webkitRequestFullScreen) {
+                        ele.webkitRequestFullScreen();
+                    }
+                // }
+
+            }
+            //退出全屏
+            function exitFullscreen() {
+                // if (checkFull() === true) {
+                    var de = document;
+                    if (de.exitFullscreen) {
+                        de.exitFullscreen();
+                    } else if (de.mozCancelFullScreen) {
+                        de.mozCancelFullScreen();
+                    } else if (de.webkitCancelFullScreen) {
+                        de.webkitCancelFullScreen();
+                    }
+                // }
+            }
+
+            //当浏览器窗口大小变化时修改视频大小
+            window.onresize = function() {
+                //修改视频尺寸
+                let videoBoxDOM = document.querySelector('.video-box');
+                let videoBoxCSS = window.getComputedStyle(videoBoxDOM, null);
+                videoObj.width = parseInt(videoBoxCSS.width) - parseInt(videoBoxCSS.paddingLeft) - parseInt(videoBoxCSS.paddingRight);
+                videoObj.height = parseInt(videoBoxCSS.height) - parseInt(videoBoxCSS.paddingTop) - parseInt(videoBoxCSS.paddingBottom);
+
+            };
+
+            //处理开始暂停按钮点击事件
+            document.querySelector('.video-btn').onclick = function () {
+                if(videoObj.readyState == 4 && videoObj.paused === true) {//视频准备就绪，并且不是在播放状态
+                    videoObj.play();
+                } else if (videoObj.readyState != 4){//视频未准备就绪
+                    alert("视频未准备就绪");
+                } else {//视频在播放中
+                    videoObj.pause();
+                }
+            };
+
+            //显示视频时长
+            videoObj.onloadedmetadata = function (ev) {
+                //计算出时分秒
+                let hour = Math.floor(videoObj.duration / 3600);
+                let minute = hour === 0 ? Math.floor(videoObj.duration / 60) : Math.floor(videoObj.duration / 60) % 60;
+                let second = minute === 0 ? Math.floor(videoObj.duration) : Math.floor(videoObj.duration % 60);
+                //格式化时间
+                hour = hour < 10 ? '0' + hour : hour;
+                minute = minute < 10 ? '0' + minute : minute;
+                second = second < 10 ? '0' + second : second;
+                document.querySelector('#video-duration').innerHTML = hour + ':' + minute + ':' + second;
+            };
+
+            //视频缓冲进度显示
+            videoObj.onprogress = function (ev) {
+                console.log('progress');
+                if (videoObj.buffered.length > 0) {
+                    let bufferedInDuration = Math.ceil((videoObj.buffered.end(0) / videoObj.duration) * 100);
+                    // let progressWidth = document.querySelector('.video-progress').offsetWidth;
+                    // let loadedWidth = Math.ceil(progressWidth * bufferedInDuration);
+                    // loadedWidth = loadedWidth > progressWidth ? progressWidth : loadedWidth;
+                    bufferedInDuration = bufferedInDuration > 100 ? 100 : bufferedInDuration;
+                    document.querySelector('.video-loaded').style.width = bufferedInDuration + '%';
+                }
+            };
+
+            //当前播放位置变更事件处理函数
+            videoObj.ontimeupdate = function () {
+                let playedInDuration = Math.ceil((videoObj.currentTime / videoObj.duration) * 100);
+                // let progressWidth = document.querySelector('.video-progress').offsetWidth;
+                // let playedWidth = Math.ceil(progressWidth * playedInDuration);
+                // playedWidth = playedWidth > progressWidth ? progressWidth : playedWidth;
+                playedInDuration = playedInDuration > 100 ? 100 : playedInDuration;
+                document.querySelector('.video-played').style.width = playedInDuration + '%';
+                console.log("----------------------------");
+
+                console.log("duration：" + videoObj.duration);
+                console.log("进度width：" + window.getComputedStyle(document.querySelector('.video-played'), null).width);
+                console.log("currentTime实际值：" + videoObj.currentTime);
+                console.log("currentTime实际值占比：" + videoObj.currentTime / videoObj.duration);
+                //计算出时分秒
+                let hour = Math.floor(videoObj.currentTime / 3600);
+                let minute = hour === 0 ? Math.floor(videoObj.currentTime / 60) : Math.floor(videoObj.currentTime / 60) % 60;
+                let second = minute === 0 ? Math.floor(videoObj.currentTime) : Math.floor(videoObj.currentTime % 60);
+                //格式化时间
+                hour = hour < 10 ? '0' + hour : hour;
+                minute = minute < 10 ? '0' + minute : minute;
+                second = second < 10 ? '0' + second : second;
+                document.querySelector('#video-current').innerHTML = hour + ':' + minute + ':' + second;
+            };
+
+            //播放媒介事件处理程序--更改播放按钮状态
+            videoObj.onplay = function() {
+                startBtn.style.setProperty('display', 'none');
+                pauseBtn.style.setProperty('display', 'block');
+            };
+
+            //暂停媒介事件处理程序--更改播放按钮状态
+            videoObj.onpause = function() {
+                startBtn.style.setProperty('display', 'block');
+                pauseBtn.style.setProperty('display', 'none');
+            };
+
+            //全屏按钮点击事件处理程序
+            document.querySelector('.fullscreen-btn').onclick = function (ev) {
+                let fullscreenBtn = document.querySelector('#enter-fullscreen');
+                let exitFullscreenBtn = document.querySelector('#exit-fullscreen');
+                if (ev.target.id === 'enter-fullscreen') {
+                    fullScreen();
+                    //PC端的全屏
+                    //修改视频容器的大小
+                    boxDOM.classList.add('fullscreen-box');
+
+                    //修改按钮状态
+                    fullscreenBtn.classList.add('hidden');
+                    exitFullscreenBtn.classList.remove('hidden');
+
+                } else if (ev.target.id === 'exit-fullscreen'){
+                    exitFullscreen();
+                    //PC端的全屏
+                    //修改视频容器的大小
+                    boxDOM.classList.remove('fullscreen-box');
+
+                    //让视频恢复原尺寸
+                    videoObj.width = videoOriginWidth;
+                    videoObj.height = videoOriginHeight;
+
+                    //修改按钮状态
+                    exitFullscreenBtn.classList.add('hidden');
+                    fullscreenBtn.classList.remove('hidden');
+
+                }
+            };
+
+            //点击进度条切换位置效果
+            document.querySelector('.video-progress').onclick = function (ev) {
+              //  计算点击位置的x轴距离占进度条总长度的比例，然后乘以视频总时长，再设置视频当前位置
+                let progressWidth = parseFloat(window.getComputedStyle(document.querySelector('.video-progress'), null).width);
+                // videoObj.currentTime = Math.ceil(ev.offsetX / progressWidth) * videoObj.duration;
+                videoObj.currentTime = ev.offsetX / progressWidth * videoObj.duration;
+
+                // console.log('offsetX:' + ev.offsetX);
+                // console.log('offsetX占比:' + ev.offsetX / progressWidth);
+                // console.log('currentTime应该值:' + ev.offsetX / progressWidth * videoObj.duration);
+                // console.log((ev.offsetX / progressWidth) * videoObj.duration);
+              // console.log(ev.offsetX);
+            };
+        }
+
+        )();
+    </script>
+</body>
+</html>
