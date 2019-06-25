@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>魔方</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        .mf{
+            margin: 200px 0 0 300px;
+            overflow: visible;
+            transform-style: preserve-3d;
+            transform-origin: 50% 50% -85px;
+            /*transform: rotateX(98deg) rotateY(11deg) rotateZ(-128deg);*/
+            transform: rotateX(10deg) rotateY(10deg) rotateZ(10deg);
+            width: 170px;
+            height: 170px;
+            animation: mf-rotate  8s;
+        }
+        ul {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            width: 170px;
+            height: 170px;
+            position: absolute;
+            /*backface-visibility: hidden; */
+        }
+        li {
+            list-style: none;
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            line-height: 50px;
+            font-size: 30px;
+            border-radius: 8px;
+        }
+        .top {
+            transform: rotateX(90deg) translateY(-85px) translateZ(85px);
+        }
+        .top li{
+            background-color: blueviolet;
+        }
+        .back{
+            transform: translateZ(-170px);
+        }
+        .back li{
+            background-color: chartreuse;
+        }
+        .left{
+            transform: rotateY(-90deg) translateX(-85px) translateZ(85px);
+        }
+        .left li{
+            background-color: chocolate;
+        }
+        .front{}
+        .front li{
+            background-color: darkgreen;
+        }
+        .right{
+            transform: rotateY(90deg) translateX(85px) translateZ(85px);
+        }
+        .right li{
+            background-color: aqua;
+        }
+        .bottom{
+            transform: rotateX(-90deg) translateY(85px) translateZ(85px);
+        }
+        .bottom li{
+            background-color: #0a5e8b;
+        }
+
+        @keyframes mf-rotate {
+            0% {
+                transform: rotateX(10deg) rotateY(10deg) rotateZ(10deg);
+            }
+            25% {
+                transform: rotateX(30deg) rotateY(14deg) rotateZ(0deg);
+            }
+            50% {
+                transform: rotateX(-34deg) rotateY(-31deg) rotateZ(-44deg);
+            }
+            60% {
+                transform: rotateX(35deg) rotateY(38deg) rotateZ(-32deg);
+            }
+            75% {
+                transform: rotateX(98deg) rotateY(11deg) rotateZ(-128deg);
+            }
+            85% {
+                transform: rotateX(113deg) rotateY(-14deg) rotateZ(-235deg);
+            }
+            100% {
+                transform: rotateX(10deg) rotateY(10deg) rotateZ(10deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mf">
+        <ul class="top">
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+            <li>4</li>
+            <li>5</li>
+            <li>6</li>
+            <li>7</li>
+            <li>8</li>
+            <li>9</li>
+        </ul>
+        <ul class="back">
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+            <li>4</li>
+            <li>5</li>
+            <li>6</li>
+            <li>7</li>
+            <li>8</li>
+            <li>9</li>
+        </ul>
+        <ul class="left">
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+            <li>4</li>
+            <li>5</li>
+            <li>6</li>
+            <li>7</li>
+            <li>8</li>
+            <li>9</li>
+        </ul>
+        <ul class="front">
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+            <li>4</li>
+            <li>5</li>
+            <li>6</li>
+            <li>7</li>
+            <li>8</li>
+            <li>9</li>
+        </ul>
+        <ul class="right">
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+            <li>4</li>
+            <li>5</li>
+            <li>6</li>
+            <li>7</li>
+            <li>8</li>
+            <li>9</li>
+        </ul>
+        <ul class="bottom">
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+            <li>4</li>
+            <li>5</li>
+            <li>6</li>
+            <li>7</li>
+            <li>8</li>
+            <li>9</li>
+        </ul>
+
+
+
+    </div>
+</body>
+</html>
